@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload a Level</title>
+  <style>
+    body { font-family: sans-serif; max-width: 450px; margin: 50px auto; padding: 20px; }
+    input, button { display: block; width: 100%; margin-top: 12px; padding: 10px; box-sizing: border-box; }
+    button { background: #2ea44f; color: white; border: none; font-weight: bold; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>Upload Your Game Level</h2>
+  <form action="YOUR_ENDPOINT_URL_HERE" method="POST" enctype="multipart/form-data">
+    <input type="text" name="level_name" placeholder="Level Name" required>
+    <input type="text" name="creator" placeholder="Your Name" required>
+    <input type="file" name="level_file" required>
+    <button type="submit">Upload Level</button>
+  </form>
+</body>
+</html>
