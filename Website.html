@@ -3,21 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Submit a Level</title>
+  <title>Upload Level to Game</title>
   <style>
     body { font-family: sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
     input, textarea, button { display: block; width: 100%; margin-top: 12px; padding: 10px; box-sizing: border-box; }
-    textarea { height: 180px; font-family: monospace; resize: vertical; }
+    textarea { height: 200px; font-family: monospace; resize: vertical; }
     button { background: #2ea44f; color: white; border: none; font-weight: bold; cursor: pointer; }
+    #status { margin-top: 15px; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h2>Submit Your Game Level</h2>
-  <form action="https://formspree.io/f/xgakajnn" method="POST">
-    <input type="text" name="level_name" placeholder="Level Name" required>
-    <input type="text" name="creator" placeholder="Your Name" required>
-    <textarea name="level_data" placeholder="Paste your level text or code here..." required></textarea>
-    <button type="submit">Submit Level</button>
-  </form>
+
+  <h2>Upload Level to Game</h2>
+  <input type="text" id="levelName" placeholder="Level Name" required>
+  <textarea id="levelText" placeholder="Paste your level plain text here..." required></textarea>
+  <button id="uploadBtn" onclick="uploadLevel()">Upload to Game</button>
+  <div id="status"></div>
+
+  <script>
+    const SUPABASE_URL = 'https://sslftfwdsozjpoyxlstw.supabase.co';
+    const SUPABASE_KEY = 'sslftfwdsozjpoyxlstw';
+
+    async function uploadLevel() {
+      const name = document.getElementById('levelName').value.trim();
+      const level_text = document.getElementById('levelText').value.trim();
+      const status = document.getElementById('status');
+
+      if (!name || !level_text) {
+        status.textContent = 'Please fill in both fields.';
+        return;
+      }
+
+      const btn = document.getElementById('uploadBtn');
+      btn.disabled = true;
+      status.textContent = 'Uploading...';
+
+      const response = await https://sslftfwdsozjpoyxlstw.supabase.co, {
+        method: 'POST',
+        headers: {
+          'apikey': sslftfwdsozjpoyxlstw,
+          'Authorization': `Bearer ${sslftfwdsozjpoyxlstw}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, level_text })
+      });
+
+      if (response.ok) {
+        status.textContent = 'Level uploaded! It is now available inside the game.';
+        document.getElementById('levelName').value = '';
+        document.getElementById('levelText').value = '';
+      } else {
+        status.textContent = 'Upload failed. Check your Supabase settings.';
+      }
+
+      btn.disabled = false;
+    }
+  </script>
 </body>
 </html>
