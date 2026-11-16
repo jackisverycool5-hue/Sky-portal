@@ -3,60 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload Level to Game</title>
+  <title>Level ID & Link Generator</title>
   <style>
-    body { font-family: sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
-    input, textarea, button { display: block; width: 100%; margin-top: 12px; padding: 10px; box-sizing: border-box; }
-    textarea { height: 200px; font-family: monospace; resize: vertical; }
-    button { background: #2ea44f; color: white; border: none; font-weight: bold; cursor: pointer; }
-    #status { margin-top: 15px; font-weight: bold; }
+    body { font-family: sans-serif; max-width: 550px; margin: 40px auto; padding: 20px; }
+    textarea, input { width: 100%; box-sizing: border-box; font-family: monospace; padding: 10px; margin-top: 8px; }
+    textarea { height: 180px; resize: vertical; }
+    button { margin-top: 10px; padding: 10px 16px; background: #2ea44f; color: white; border: none; font-weight: bold; cursor: pointer; }
+    button.secondary { background: #444; }
+    .box { margin-top: 20px; padding: 15px; background: #f6f8fa; border: 1px solid #d0d7de; }
+    .hidden { display: none; }
+    label { font-weight: bold; display: block; margin-top: 12px; }
   </style>
 </head>
 <body>
 
-  <h2>Upload Level to Game</h2>
-  <input type="text" id="levelName" placeholder="Level Name" required>
-  <textarea id="levelText" placeholder="Paste your level plain text here..." required></textarea>
-  <button id="uploadBtn" onclick="uploadLevel()">Upload to Game</button>
-  <div id="status"></div>
+  <div id="createSection">
+    <h2>Generate Level ID & Link</h2>
+    <textarea id="inputText" placeholder="Paste your plain-text level here..."></textarea>
+    <button onclick="generate()">Create Level ID & Link</button>
+
+    <div id="resultBox" class="box hidden">
+      <label for="levelId">Level ID:</label>
+      <input type="text" id="levelId" readonly>
+      <button onclick="copyValue('levelId')">Copy Level ID</button>
+
+      <label for="levelLink">Plain-Text Level Link:</label>
+      <input type="text" id="levelLink" readonly>
+      <button class="secondary" onclick="copyValue('levelLink')">Copy Link</button>
+    </div>
+  </div>
 
   <script>
-    const SUPABASE_URL = 'https://sslftfwdsozjpoyxlstw.supabase.co';
-    const SUPABASE_KEY = 'sslftfwdsozjpoyxlstw';
+    function encodeToId(text) {
+      const base64 = btoa(unescape(encodeURIComponent(text)));
+      return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
 
-    async function uploadLevel() {
-      const name = document.getElementById('levelName').value.trim();
-      const level_text = document.getElementById('levelText').value.trim();
-      const status = document.getElementById('status');
+    function decodeFromId(id) {
+      let base64 = id.replace(/-/g, '+').replace(/_/g, '/');
+      while (base64.length % 4) base64 += '=';
+      return decodeURIComponent(escape(atob(base64)));
+    }
 
-      if (!name || !level_text) {
-        status.textContent = 'Please fill in both fields.';
-        return;
+    // If opened with a link (#ID), wipe the page and show ONLY the plain-text level
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      try {
+        const levelText = decodeFromId(hash);
+        document.body.innerHTML = '';
+        document.body.style.cssText = 'margin: 0; padding: 0; max-width: none;';
+        const pre = document.createElement('pre');
+        pre.style.cssText = 'margin: 0; font-family: monospace; white-space: pre-wrap; word-wrap: break-word;';
+        pre.textContent = levelText;
+        document.body.appendChild(pre);
+      } catch (e) {
+        document.body.textContent = 'Invalid Level ID.';
       }
+    }
 
-      const btn = document.getElementById('uploadBtn');
-      btn.disabled = true;
-      status.textContent = 'Uploading...';
+    function generate() {
+      const raw = document.getElementById('inputText').value;
+      if (!raw.trim()) return;
 
-      const response = await https://sslftfwdsozjpoyxlstw.supabase.co, {
-        method: 'POST',
-        headers: {
-          'apikey': sslftfwdsozjpoyxlstw,
-          'Authorization': `Bearer ${sslftfwdsozjpoyxlstw}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name, level_text })
-      });
+      const id = encodeToId(raw);
+      const url = `${window.location.origin}${window.location.pathname}#${id}`;
 
-      if (response.ok) {
-        status.textContent = 'Level uploaded! It is now available inside the game.';
-        document.getElementById('levelName').value = '';
-        document.getElementById('levelText').value = '';
-      } else {
-        status.textContent = 'Upload failed. Check your Supabase settings.';
-      }
+      document.getElementById('levelId').value = id;
+      document.getElementById('levelLink').value = url;
+      document.getElementById('resultBox').classList.remove('hidden');
+    }
 
-      btn.disabled = false;
+    function copyValue(elementId) {
+      const el = document.getElementById(elementId);
+      el.select();
+      navigator.clipboard.writeText(el.value);
     }
   </script>
 </body>
